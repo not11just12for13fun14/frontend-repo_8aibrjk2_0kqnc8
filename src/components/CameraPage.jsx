@@ -113,14 +113,17 @@ const CameraPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-rose-50 via-pink-50 to-amber-50 text-neutral-800">
-      {/* Hero with Spline */}
-      <div className="relative h-[260px] w-full overflow-hidden">
-        {/* Lazy import to avoid SSR concerns */}
-        <SplineCover />
-        <div className="absolute inset-0 bg-gradient-to-b from-white/0 via-white/0 to-white/80 pointer-events-none" />
+      {/* Hero with a static polaroid camera image (no 3D) */}
+      <div className="relative h-[220px] w-full overflow-hidden">
+        <img
+          src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=2000&auto=format&fit=crop"
+          alt="Polaroid camera"
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-white/0 via-white/0 to-white/85" />
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 -mt-24">
+      <div className="max-w-6xl mx-auto px-4 -mt-20">
         {/* Polaroid Camera */}
         <div className="bg-white/80 backdrop-blur rounded-3xl shadow-2xl p-6 sm:p-10 border border-white flex flex-col lg:flex-row gap-8">
           <div className="flex-1">
@@ -201,18 +204,6 @@ const CameraPage = () => {
         </div>
       </div>
     </div>
-  )
-}
-
-const SplineCover = () => {
-  const [mounted, setMounted] = useState(false)
-  useEffect(() => setMounted(true), [])
-  if (!mounted) return <div className="w-full h-full" />
-  const Spline = React.lazy(() => import('@splinetool/react-spline'))
-  return (
-    <React.Suspense fallback={<div className="w-full h-full bg-gradient-to-br from-rose-100 to-pink-100" /> }>
-      <Spline default scene="https://prod.spline.design/xzUirwcZB9SOxUWt/scene.splinecode" style={{ width: '100%', height: '100%' }} />
-    </React.Suspense>
   )
 }
 
