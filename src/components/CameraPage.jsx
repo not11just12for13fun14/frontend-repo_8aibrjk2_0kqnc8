@@ -31,10 +31,10 @@ function useWebcam() {
   return { videoRef, streaming, start, stop }
 }
 
-const PolaroidCard = ({ src, onShare }) => {
+const PolaroidCard = ({ src, onShare, className = '' }) => {
   return (
     <motion.div
-      className="relative w-40 h-48 bg-white rounded-md shadow-lg p-2 flex flex-col items-center cursor-grab"
+      className={`relative w-40 h-48 bg-white rounded-md shadow-lg p-2 flex flex-col items-center cursor-grab ${className}`}
       whileHover={{ y: -4 }}
       style={{ userSelect: 'none' }}
       drag
@@ -60,6 +60,7 @@ const CameraPage = () => {
   const [shots, setShots] = useState([])
   const [showWebcam, setShowWebcam] = useState(false)
   const [ejecting, setEjecting] = useState(false)
+  const [lastShot, setLastShot] = useState(null)
 
   const backend = import.meta.env.VITE_BACKEND_URL || ''
 
@@ -80,12 +81,13 @@ const CameraPage = () => {
     ctx.drawImage(video, 0, 0, w, h)
     const data = canvas.toDataURL('image/png')
 
-    // Animate eject
+    // Animate eject from the camera
+    setLastShot(data)
     setEjecting(true)
     setTimeout(() => {
       setShots(prev => [data, ...prev])
       setEjecting(false)
-    }, 900)
+    }, 1200)
   }
 
   const shareShot = async (src) => {
@@ -122,43 +124,56 @@ const CameraPage = () => {
         {/* Polaroid Camera */}
         <div className="bg-white/80 backdrop-blur rounded-3xl shadow-2xl p-6 sm:p-10 border border-white flex flex-col lg:flex-row gap-8">
           <div className="flex-1">
-            <div className="relative mx-auto w-full max-w-md aspect-[4/3] bg-neutral-100 rounded-2xl border-8 border-neutral-200 shadow-inner overflow-hidden">
-              {/* Camera screen */}
-              {!showWebcam && (
-                <div className="w-full h-full flex flex-col items-center justify-center gap-3">
-                  <Camera className="w-10 h-10 text-neutral-400" />
-                  <div className="text-neutral-500">Click a Picture</div>
-                  <button onClick={openCamera} className="px-4 py-2 rounded-full bg-pink-500 text-white shadow hover:shadow-md transition">Open Camera</button>
-                </div>
-              )}
-              {showWebcam && (
-                <div className="relative w-full h-full">
-                  <video ref={videoRef} className="w-full h-full object-cover" />
-                  <button onClick={takeShot} className="absolute bottom-3 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full bg-amber-500 text-white shadow hover:shadow-md transition flex items-center gap-2">
-                    <ImageIcon className="w-4 h-4" />
-                    Take a Shot
-                  </button>
-                </div>
-              )}
+            {/* Camera body */}
+            <div className="relative mx-auto w-full max-w-md aspect-[4/3] rounded-2xl border-8 border-neutral-200 shadow-inner bg-gradient-to-b from-neutral-100 to-neutral-200">
+              {/* Screen area */}
+              <div className="absolute inset-0 m-0.5 rounded-[12px] overflow-hidden">
+                {!showWebcam && (
+                  <div className="w-full h-full flex flex-col items-center justify-center gap-3">
+                    <Camera className="w-10 h-10 text-neutral-400" />
+                    <div className="text-neutral-500">Click a Picture</div>
+                    <button onClick={openCamera} className="px-4 py-2 rounded-full bg-pink-500 text-white shadow hover:shadow-md transition">Open Camera</button>
+                  </div>
+                )}
+                {showWebcam && (
+                  <div className="relative w-full h-full">
+                    <video ref={videoRef} className="w-full h-full object-cover" />
+                    <button onClick={takeShot} className="absolute bottom-3 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full bg-amber-500 text-white shadow hover:shadow-md transition flex items-center gap-2">
+                      <ImageIcon className="w-4 h-4" />
+                      Take a Shot
+                    </button>
+                  </div>
+                )}
+
+                {/* Ejecting photo (comes out through the slot) */}
+                <AnimatePresence>
+                  {ejecting && lastShot && (
+                    <motion.div
+                      initial={{ y: 0, rotate: 1, opacity: 0.9 }}
+                      animate={{ y: 160, opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ type: 'spring', stiffness: 120, damping: 18 }}
+                      className="absolute left-1/2 -translate-x-1/2 bottom-0"
+                      style={{ zIndex: 20 }}
+                    >
+                      <div className="w-40 h-48 bg-white rounded-md shadow-xl p-2">
+                        <div className="w-full h-32 bg-neutral-200 rounded-sm overflow-hidden">
+                          <img src={lastShot} alt="eject" className="w-full h-full object-cover" />
+                        </div>
+                        <div className="mt-2 h-3 bg-neutral-100 rounded" />
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              {/* Slot overlay to sell the effect */}
+              <div className="pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-[-6px] w-[68%] h-4 rounded-b-md bg-neutral-700 shadow-[0_4px_8px_rgba(0,0,0,0.25)]" style={{ zIndex: 30 }} />
+              <div className="pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-0 w-[72%] h-1 bg-black/40 blur-[1px]" />
             </div>
 
-            {/* Eject animation slot */}
-            <div className="relative mt-6 h-24">
-              <AnimatePresence>
-                {ejecting && (
-                  <motion.div
-                    initial={{ y: -90, rotate: 2, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ type: 'spring', stiffness: 120, damping: 16 }}
-                    className="absolute left-1/2 -translate-x-1/2 w-40 h-48 bg-white rounded-md shadow-xl p-2"
-                  >
-                    <div className="w-full h-32 bg-neutral-200 rounded-sm" />
-                    <div className="mt-2 h-3 bg-neutral-100 rounded" />
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
+            {/* space under camera where photo slides into view */}
+            <div className="relative mt-16" />
           </div>
 
           {/* Shots tray */}
