@@ -113,17 +113,27 @@ const CameraPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-rose-50 via-pink-50 to-amber-50 text-neutral-800">
-      {/* Hero with a static polaroid camera image (no 3D) */}
-      <div className="relative h-[220px] w-full overflow-hidden">
-        <img
-          src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=2000&auto=format&fit=crop"
-          alt="Polaroid camera"
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-white/0 via-white/0 to-white/85" />
+      {/* Hero with the provided static polaroid camera image */}
+      <div className="relative w-full flex flex-col items-center pt-6">
+        <div className="w-full max-w-3xl overflow-hidden rounded-2xl shadow-lg">
+          <img
+            src="https://images-cdn.ubuy.co.in/6639b48421ad8b22646a4e91-polaroid-now-generation-2-i-type-instant.jpg"
+            alt="Polaroid camera"
+            className="w-full h-auto object-cover"
+          />
+        </div>
+        {/* Open camera button directly under the image */}
+        {!showWebcam && (
+          <button
+            onClick={openCamera}
+            className="mt-4 px-5 py-2.5 rounded-full bg-pink-500 text-white shadow hover:shadow-md transition"
+          >
+            Open Camera
+          </button>
+        )}
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 -mt-20">
+      <div className="max-w-6xl mx-auto px-4 mt-8">
         {/* Polaroid Camera */}
         <div className="bg-white/80 backdrop-blur rounded-3xl shadow-2xl p-6 sm:p-10 border border-white flex flex-col lg:flex-row gap-8">
           <div className="flex-1">
@@ -132,11 +142,7 @@ const CameraPage = () => {
               {/* Screen area */}
               <div className="absolute inset-0 m-0.5 rounded-[12px] overflow-hidden">
                 {!showWebcam && (
-                  <div className="w-full h-full flex flex-col items-center justify-center gap-3">
-                    <Camera className="w-10 h-10 text-neutral-400" />
-                    <div className="text-neutral-500">Click a Picture</div>
-                    <button onClick={openCamera} className="px-4 py-2 rounded-full bg-pink-500 text-white shadow hover:shadow-md transition">Open Camera</button>
-                  </div>
+                  <div className="w-full h-full" />
                 )}
                 {showWebcam && (
                   <div className="relative w-full h-full">
