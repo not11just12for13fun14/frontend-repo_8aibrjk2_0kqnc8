@@ -112,32 +112,44 @@ const CameraPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-rose-50 via-pink-50 to-amber-50 text-neutral-800">
-      {/* Top area: circular lens preview above the camera */}
       <div className="relative w-full flex flex-col items-center pt-8">
-        {/* Circular lens webcam preview */}
-        {showWebcam && (
-          <div className="relative mb-6">
-            <div className="w-56 h-56 sm:w-64 sm:h-64 rounded-full overflow-hidden border-[10px] border-neutral-200 shadow-2xl bg-black flex items-center justify-center">
-              <video ref={videoRef} className="w-full h-full object-cover" />
-            </div>
-            {/* Shutter button below the lens */}
-            <button
-              onClick={takeShot}
-              className="mx-auto mt-4 flex items-center gap-2 px-5 py-2.5 rounded-full bg-amber-500 text-white shadow hover:shadow-md transition"
-            >
-              <CameraIcon className="w-4 h-4" />
-              Take a Shot
-            </button>
-          </div>
-        )}
-
-        {/* Polaroid camera hero image */}
+        {/* Polaroid camera hero image with embedded circular lens preview */}
         <div className="relative w-full max-w-3xl overflow-hidden rounded-2xl shadow-lg">
           <img
             src="https://images-cdn.ubuy.co.in/6639b48421ad8b22646a4e91-polaroid-now-generation-2-i-type-instant.jpg"
             alt="Polaroid camera"
             className="w-full h-auto object-cover"
           />
+
+          {/* Lens overlay positioned roughly where the camera lens is on the image */}
+          {showWebcam && (
+            <div
+              className="absolute rounded-full overflow-hidden shadow-2xl border-[8px] border-neutral-200 bg-black"
+              style={{
+                width: '9vw',
+                height: '9vw',
+                minWidth: '88px',
+                minHeight: '88px',
+                maxWidth: '140px',
+                maxHeight: '140px',
+                top: '18%',
+                right: '18%',
+              }}
+            >
+              <video ref={videoRef} className="w-full h-full object-cover" />
+            </div>
+          )}
+
+          {/* Shutter button floating near bottom center of the camera image */}
+          {showWebcam && (
+            <button
+              onClick={takeShot}
+              className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 px-5 py-2.5 rounded-full bg-amber-500 text-white shadow hover:shadow-md transition"
+            >
+              <CameraIcon className="w-4 h-4" />
+              Take a Shot
+            </button>
+          )}
 
           {/* Ejecting photo animation from under the camera body */}
           <AnimatePresence>
